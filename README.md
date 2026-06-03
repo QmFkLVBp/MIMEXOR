@@ -1,57 +1,81 @@
-# Security Lab Telegram Bot
+# 🛡️ Security Lab Telegram Bot
 
-A Telegram bot that generates safe test `.exe` files for security lab research. Each file simulates suspicious-but-harmless behaviour (IoC indicators) for AV/EDR testing in isolated environments.
+<p align="center">
+  Telegram bot for generating safe test binaries with suspicious-looking IoCs for AV/EDR lab validation.
+</p>
 
-## Run & Operate
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white" alt="Python 3.11">
+  <img src="https://img.shields.io/badge/Telegram-Bot-26A5E4?logo=telegram&logoColor=white" alt="Telegram Bot">
+  <img src="https://img.shields.io/badge/PyInstaller-6.x-orange" alt="PyInstaller">
+  <img src="https://img.shields.io/badge/Platform-Windows%20Target-success" alt="Windows Target">
+</p>
 
-- **Telegram Bot** workflow runs `python3 bot.py` — this is the main service.
-- Required env secret: `TELEGRAM_BOT_TOKEN` (set in Replit Secrets)
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
+---
 
-## Stack
+## ✨ Highlights
 
-- Python 3.11 + python-telegram-bot v22+
-- PyInstaller (compiles .py scripts → .exe)
-- pnpm workspaces, Node.js 24, TypeScript 5.9 (API server)
-- API: Express 5
+- ⚙️ Generates `.exe` artifacts for isolated security testing.
+- 🧪 Emulates suspicious behavior safely (no real harmful payloads).
+- 🔁 Produces unique output each run using UUID/randomized script internals.
+- 🇺🇦 Bot UI and messages are in Ukrainian.
 
-## Where things live
+## 📊 Repo Widgets
 
-- `bot.py` — main Telegram bot, all logic in one file
-- `pyproject.toml` — Python dependencies (python-telegram-bot, pyinstaller)
-- `artifacts/api-server/` — Express API server (health check etc.)
+<p align="center">
+  <img src="https://img.shields.io/github/repo-size/QmFkLVBp/MIMEXOR" alt="Repo Size">
+  <img src="https://img.shields.io/github/last-commit/QmFkLVBp/MIMEXOR" alt="Last Commit">
+  <img src="https://img.shields.io/github/languages/top/QmFkLVBp/MIMEXOR" alt="Top Language">
+  <img src="https://img.shields.io/github/issues/QmFkLVBp/MIMEXOR" alt="Open Issues">
+</p>
 
-## Architecture decisions
+## 🧩 Supported Behavior Profiles (`/generate`)
 
-- All bot state (webhook URL, generation counter) is in-process memory — restarts reset it.
-- Each `.exe` is compiled in a `tempfile.mkdtemp()` directory that is deleted after sending.
-- Script uniqueness is achieved via UUID-seeded variable names + random comment injections, ensuring each generated file has a different hash.
-- The `telegram==0.0.1` stub package conflicts with `python-telegram-bot` — it must NOT be added to `pyproject.toml` dependencies (uv will reinstall it automatically if listed).
+1. **Network activity** — HTTP POST requests to a configurable webhook  
+2. **Keylogger simulation** — writes fake key events to local file  
+3. **File copy** — copies files to `lab_copies/` with `LAB_` prefix  
+4. **File download** — downloads a URL to disk (dropper-style simulation)  
+5. **Self-copy** — copies executable to another path  
+6. **Popup windows** — shows MessageBox dialogs via `ctypes`  
+7. **Combo** — randomized mix of multiple profiles
 
-## Product
+## 🗂️ Project Structure
 
-7 behaviour profiles accessible via `/generate`:
-1. **Network activity** — HTTP POST requests to a configurable webhook
-2. **Keylogger simulation** — writes fake key events to a local file (no real interception)
-3. **File copy** — copies files into a `lab_copies/` directory with LAB_ prefix
-4. **File download** — downloads a URL to disk (dropper simulation)
-5. **Self-copy** — copies the executable to another path (spreader simulation)
-6. **Popup windows** — shows 3 MessageBox dialogs via ctypes
-7. **Combo** — random mix of the above
+| Path | Purpose |
+|---|---|
+| `bot.py` | Main Telegram bot logic |
+| `pyproject.toml` | Python dependencies and project metadata |
+| `artifacts/api-server/` | API server artifact location (health checks etc.) |
 
-## User preferences
+## 🛠️ Cool Tools & Stack
 
-- Language: Ukrainian (бот повністю на українській мові)
-- Target runtime: Windows (exe files, ctypes.windll, etc.)
+- **python-telegram-bot v22+** — bot interaction layer
+- **PyInstaller** — script → executable packaging
+- **Python 3.11** — runtime
+- **pnpm workspaces + Node.js 24 + TypeScript 5.9** — supporting workspace/API tooling
+- **Express 5** — API server
 
-## Gotchas
+## 🚀 Run & Operate
 
-- **Do NOT add `telegram>=0.0.1` to `pyproject.toml`** — it conflicts with python-telegram-bot by overwriting `telegram/__init__.py`. If it appears, run `uv sync` to remove it.
-- PyInstaller must be installed (`pyinstaller` in pyproject.toml) for `/generate` to work.
-- PyInstaller on Replit builds Linux ELF binaries, not Windows `.exe` — for real Windows executables the bot must run on a Windows host or use Wine + PyInstaller.
-- After any `uv add` or `installLanguagePackages` call, verify `telegram/__init__.py` still exists.
+- Main runtime: `python3 bot.py`
+- Required secret: `TELEGRAM_BOT_TOKEN`
+- API server: `pnpm --filter @workspace/api-server run dev`
+- Type check workspace: `pnpm run typecheck`
 
-## Pointers
+## 🧠 Architecture Notes
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Bot state (webhook URL, generation counter) is in-memory only.
+- Every build runs in an isolated temp directory via `tempfile.mkdtemp()`.
+- Temporary build folders are removed after file delivery.
+- Hash uniqueness is improved through UUID-based names and random comment injection.
+
+## ⚠️ Important Gotchas
+
+- **Never add `telegram>=0.0.1`** to dependencies (conflicts with `python-telegram-bot`).
+- `pyinstaller` must be present for `/generate` to produce artifacts.
+- Replit/Linux build hosts produce ELF binaries; true Windows `.exe` generation needs Windows host (or Wine-based pipeline).
+- After package operations (`uv add`, install hooks), verify `telegram/__init__.py` remains intact.
+
+## 📌 Pointers
+
+- For workspace package structure and TS setup, refer to the `pnpm-workspace` skill notes.
